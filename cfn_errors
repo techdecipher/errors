@@ -1,0 +1,5 @@
+Group
+CREATE_FAILED
+Likely root cause
+-
+The target group name arn:aws:elasticloadbalancing:us-west-2:363010889649:targetgroup/SampleTG/37041fd34bdc782c specified in targetGroupInfoList exceeds the maximum allowed length of 32 characters. (Service: AmazonCodeDeploy; Status Code: 400; Error Code: InvalidLoadBalancerInfoException; Request ID: 3e72288a-7b7d-4d63-9479-4ac092a34e9c; Proxy: null)
