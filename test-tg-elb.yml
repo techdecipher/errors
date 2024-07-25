@@ -1,0 +1,64 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation Template for Target Group Creation
+
+Resources:
+  # Security Group for Load Balancer
+  InstanceSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: 'Enable HTTP access'
+      VpcId: 'vpc-08feca1900f25be53' # Replace with your VPC ID
+      SecurityGroupIngress:
+        - IpProtocol: 'tcp'
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: '0.0.0.0/0'
+      SecurityGroupEgress:
+        - IpProtocol: '-1'
+          FromPort: '-1'
+          ToPort: '-1'
+          CidrIp: '0.0.0.0/0'
+
+  # Application Load Balancer
+  MyLoadBalancer:
+    Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
+    Properties:
+      Name: 'SampleELB'
+      Subnets: 
+        - subnet-09ff603fd9aeccb2c
+        - subnet-00cbc2dd838206fbc
+        - subnet-0581763c47811058b
+        - subnet-0dd954f53aeea3c88
+      SecurityGroups:
+        - !Ref InstanceSecurityGroup
+      Scheme: internet-facing
+
+  # Target Group
+  MyTargetGroup:
+    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
+    Properties:
+      Name: 'SampleTG'
+      Port: 80
+      Protocol: HTTP
+      VpcId: 'vpc-08feca1900f25be53'
+      HealthCheckPath: /
+      TargetType: instance
+
+  # Listener for Load Balancer
+  MyListener:
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
+    Properties:
+      LoadBalancerArn: !Ref MyLoadBalancer
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref MyTargetGroup
+      Port: 80
+      Protocol: HTTP
+
+Outputs:
+  TargetGroupARN:
+    Description: 'ARN of the created Target Group'
+    Value: !Ref MyTargetGroup
+  LoadBalancerDNS:
+    Description: 'DNS name of the load balancer'
+    Value: !GetAtt MyLoadBalancer.DNSName
